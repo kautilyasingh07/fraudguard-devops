@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="9" skipped="0" tests="10" time="3.098" timestamp="2026-04-07T06:29:46.348561+05:30" hostname="kautilya-singh-ASUS-TUF-Gaming-F15-FX507ZC4-FX577ZC4"><testcase classname="tests.test_predict" name="test_model_loads_successfully" time="0.002"><failure message="AssertionError: Model should be loaded on app startup&#10;assert False is True&#10; +  where False = is_model_loaded()">def test_model_loads_successfully():
+        """Verify that the trained model loads without errors."""
+&gt;       assert is_model_loaded() is True, "Model should be loaded on app startup"
+E       AssertionError: Model should be loaded on app startup
+E       assert False is True
+E        +  where False = is_model_loaded()
+
+tests/test_predict.py:38: AssertionError</failure></testcase><testcase classname="tests.test_predict" name="test_prediction_returns_int" time="0.016"><failure message="assert 503 == 200&#10; +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code">mock_transaction_fraud = {'C1': 1.0, 'C10': 1.0, 'C11': 1.0, 'C12': 1.0, ...}
+
+    def test_prediction_returns_int(mock_transaction_fraud):
+        """Verify that the prediction field is an integer (0 or 1)."""
+        response = client.post("/predict", json=mock_transaction_fraud)
+&gt;       assert response.status_code == 200
+E       assert 503 == 200
+E        +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code
+
+tests/test_predict.py:47: AssertionError</failure></testcase><testcase classname="tests.test_predict" name="test_confidence_score_between_0_and_1" time="0.006"><failure message="assert 503 == 200&#10; +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code">mock_transaction_fraud = {'C1': 1.0, 'C10': 1.0, 'C11': 1.0, 'C12': 1.0, ...}
+
+    def test_confidence_score_between_0_and_1(mock_transaction_fraud):
+        """Verify confidence_score is a float between 0.0 and 1.0."""
+        response = client.post("/predict", json=mock_transaction_fraud)
+&gt;       assert response.status_code == 200
+E       assert 503 == 200
+E        +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code
+
+tests/test_predict.py:60: AssertionError</failure></testcase><testcase classname="tests.test_predict" name="test_predict_valid_payload" time="0.007"><failure message="assert 503 == 200&#10; +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code">mock_transaction_legit = {'C1': 1.0, 'C10': 0.0, 'C11': 2.0, 'C12': 0.0, ...}
+
+    def test_predict_valid_payload(mock_transaction_legit):
+        """Verify /predict returns HTTP 200 for a valid transaction payload."""
+        response = client.post("/predict", json=mock_transaction_legit)
+&gt;       assert response.status_code == 200
+E       assert 503 == 200
+E        +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code
+
+tests/test_predict.py:74: AssertionError</failure></testcase><testcase classname="tests.test_predict" name="test_predict_missing_field" time="0.007" /><testcase classname="tests.test_predict" name="test_health_endpoint" time="0.006"><failure message="assert 503 == 200&#10; +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code">def test_health_endpoint():
+        """
+        Verify /health returns HTTP 200 with correct JSON structure.
+        Expected: {status: 'healthy', model_loaded: true}
+        """
+        response = client.get("/health")
+&gt;       assert response.status_code == 200
+E       assert 503 == 200
+E        +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code
+
+tests/test_predict.py:113: AssertionError</failure></testcase><testcase classname="tests.test_predict" name="test_label_fraudulent" time="0.007"><failure message="assert 503 == 200&#10; +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code">mock_transaction_fraud = {'C1': 1.0, 'C10': 1.0, 'C11': 1.0, 'C12': 1.0, ...}
+
+    def test_label_fraudulent(mock_transaction_fraud):
+        """
+        Verify /predict returns label 'fraudulent' when prediction==1.
+        Uses fixture values verified to produce fraud prediction.
+        """
+        response = client.post("/predict", json=mock_transaction_fraud)
+&gt;       assert response.status_code == 200
+E       assert 503 == 200
+E        +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code
+
+tests/test_predict.py:129: AssertionError</failure></testcase><testcase classname="tests.test_predict" name="test_label_legitimate" time="0.007"><failure message="assert 503 == 200&#10; +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code">mock_transaction_legit = {'C1': 1.0, 'C10': 0.0, 'C11': 2.0, 'C12': 0.0, ...}
+
+    def test_label_legitimate(mock_transaction_legit):
+        """
+        Verify /predict returns label 'legitimate' when prediction==0.
+        Uses fixture values verified to produce legitimate prediction.
+        """
+        response = client.post("/predict", json=mock_transaction_legit)
+&gt;       assert response.status_code == 200
+E       assert 503 == 200
+E        +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code
+
+tests/test_predict.py:154: AssertionError</failure></testcase><testcase classname="tests.test_predict" name="test_predict_response_has_timestamp" time="0.007"><failure message="assert 503 == 200&#10; +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code">mock_transaction_legit = {'C1': 1.0, 'C10': 0.0, 'C11': 2.0, 'C12': 0.0, ...}
+
+    def test_predict_response_has_timestamp(mock_transaction_legit):
+        """Verify the timestamp field is a valid ISO 8601 string."""
+        response = client.post("/predict", json=mock_transaction_legit)
+&gt;       assert response.status_code == 200
+E       assert 503 == 200
+E        +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code
+
+tests/test_predict.py:174: AssertionError</failure></testcase><testcase classname="tests.test_predict" name="test_predict_transaction_id_generated" time="0.008"><failure message="assert 503 == 200&#10; +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code">mock_transaction_legit = {'C1': 1.0, 'C10': 0.0, 'C11': 2.0, 'C12': 0.0, ...}
+
+    def test_predict_transaction_id_generated(mock_transaction_legit):
+        """Verify that a UUID transaction_id is generated for each request."""
+        response = client.post("/predict", json=mock_transaction_legit)
+&gt;       assert response.status_code == 200
+E       assert 503 == 200
+E        +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code
+
+tests/test_predict.py:187: AssertionError</failure></testcase></testsuite></testsuites>

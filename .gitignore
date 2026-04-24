@@ -1,47 +1,11 @@
-# Python
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Virtual Environment
+.env
+*.pyc
 venv/
-ENV/
-
-# Pytest / Coverage
+.DS_Store
+node_modules/
+*.egg-info/
+dist/
+build/
 .pytest_cache/
 .coverage
-coverage.xml
-htmlcov/
-test-results.xml
-
-# Project specifics
-data/*.csv
-data/*.zip
-
-# IDEs
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# MacOS
-.DS_Store
-
-# Note: app/model.pkl is NOT ignored because it will be tracked via Git LFS
