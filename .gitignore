@@ -9,3 +9,5 @@ dist/
 build/
 .pytest_cache/
 .coverage
+jenkins-cli.jar*
+data/
