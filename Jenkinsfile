@@ -38,7 +38,7 @@ pipeline {
         stage('Docker Build') {
             steps {
                 sh '''
-                    export DOCKER_BUILDKIT=1
+                    export DOCKER_BUILDKIT=0
                     docker pull ${DOCKER_IMAGE}:latest || true
                     docker build --cache-from ${DOCKER_IMAGE}:latest -t ${DOCKER_IMAGE}:latest -t ${DOCKER_IMAGE}:${GIT_COMMIT_SHORT} -f docker/Dockerfile .
                     docker inspect ${DOCKER_IMAGE}:latest
