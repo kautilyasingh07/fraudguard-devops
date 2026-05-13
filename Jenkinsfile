@@ -49,8 +49,10 @@ pipeline {
         stage('Docker Push') {
             steps {
                 withVault([
-                    vaultUrl: 'http://localhost:8200',
-                    vaultCredentialId: 'vault-approle',
+                    configuration: [
+                        vaultUrl: 'http://localhost:8200',
+                        vaultCredentialId: 'vault-approle'
+                    ],
                     vaultSecrets: [[
                         path: 'secret/dockerhub',
                         secretValues: [
@@ -88,8 +90,10 @@ pipeline {
         stage('Kubernetes Deploy') {
             steps {
                 withVault([
-                    vaultUrl: 'http://localhost:8200',
-                    vaultCredentialId: 'vault-approle',
+                    configuration: [
+                        vaultUrl: 'http://localhost:8200',
+                        vaultCredentialId: 'vault-approle'
+                    ],
                     vaultSecrets: [[
                         path: 'secret/kubeconfig',
                         secretValues: [
