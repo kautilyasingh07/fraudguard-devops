@@ -1,39 +1,33 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.12-slim'
-            args '-u root:root' // Run as root to install packages globally in the container
-        }
-    }
+    agent any
 
     environment {
-        PYTHONUNBUFFERED = '1'
-        PYTHONDONTWRITEBYTECODE = '1'
+        DOCKER_IMAGE = "kautilyasingh/fraudguard"
+        PYTHON_VENV  = "${WORKSPACE}/venv"
     }
 
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
+                script {
+                    env.GIT_COMMIT_SHORT = sh(
+                        script: 'git rev-parse HEAD | cut -c1-8',
+                        returnStdout: true
+                    ).trim()
+                }
+                echo "Checked out commit: ${env.GIT_COMMIT_SHORT}"
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Unit Test') {
             steps {
                 sh '''
-                    apt-get update && apt-get install -y gcc
-                    python3 -m pip install --upgrade pip
-                    pip3 install -r app/requirements.txt
-                    pip3 install -r tests/requirements-test.txt
-                '''
-            }
-        }
-
-        stage('Unit Tests & Coverage') {
-            steps {
-                sh '''
-                    # FR-119: Run tests with 70% coverage requirement
-                    python3 -m pytest tests/ -v --junitxml=test-results.xml --cov=app --cov-report=xml --cov-report=term-missing --cov-fail-under=70
+                    python3 -m venv ${PYTHON_VENV}
+                    ${PYTHON_VENV}/bin/pip install --upgrade pip
+                    ${PYTHON_VENV}/bin/pip install -r app/requirements.txt
+                    ${PYTHON_VENV}/bin/pip install -r tests/requirements-test.txt
+                    ${PYTHON_VENV}/bin/pytest tests/ -v --junitxml=test-results.xml --cov=app --cov-report=term-missing --cov-fail-under=70
                 '''
             }
             post {
@@ -42,14 +36,55 @@ pipeline {
                 }
             }
         }
+
+        stage('Docker Build') {
+            steps {
+                sh '''
+                    docker build -f docker/Dockerfile -t ${DOCKER_IMAGE}:latest -t ${DOCKER_IMAGE}:${GIT_COMMIT_SHORT} .
+                    docker inspect ${DOCKER_IMAGE}:latest > /dev/null
+                    docker inspect ${DOCKER_IMAGE}:${GIT_COMMIT_SHORT} > /dev/null
+                '''
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                // Implemented in Phase 3 — Vault + Docker Push
+                sh 'echo "Stage 4 placeholder - skipping"'
+            }
+        }
+
+        stage('Ansible Provision') {
+            steps {
+                // Implemented in Phase 4 — Ansible
+                sh 'echo "Stage 5 placeholder - skipping"'
+            }
+        }
+
+        stage('Kubernetes Deploy') {
+            steps {
+                // Implemented in Phase 5 — Kubernetes
+                sh 'echo "Stage 6 placeholder - skipping"'
+            }
+        }
+
+        stage('Newman Smoke Test') {
+            steps {
+                // Implemented in Phase 5 — Newman
+                sh 'echo "Stage 7 placeholder - skipping"'
+            }
+        }
     }
 
     post {
-        success {
-            echo "CI Pipeline completed successfully. All tests passed and code coverage is above 70%."
+        always {
+            cleanWs()
         }
         failure {
-            echo "CI Pipeline failed. Check the logs for test or coverage failures."
+            echo "Pipeline FAILED. Check logs above."
+        }
+        success {
+            echo "Build ${GIT_COMMIT_SHORT} completed successfully."
         }
     }
 }
