@@ -1,0 +1,48 @@
+---
+- name: Check if kubectl exists
+  ansible.builtin.stat:
+    path: /usr/local/bin/kubectl
+  register: kubectl_stat
+  ignore_errors: yes
+
+- name: Download kubectl v1.29.0
+  become: yes
+  ansible.builtin.get_url:
+    url: https://dl.k8s.io/release/v1.29.0/bin/linux/amd64/kubectl
+    dest: /usr/local/bin/kubectl
+    mode: "0755"
+  when: not kubectl_stat.stat.exists
+
+- name: Check minikube status
+  ansible.builtin.command: minikube status
+  register: mk_status
+  ignore_errors: yes
+  changed_when: false
+
+- name: Start minikube if not running
+  ansible.builtin.command: >-
+    minikube start --driver=docker --memory={{ minikube_memory }}
+    --cpus={{ minikube_cpus }} --kubernetes-version=v1.29.0
+  when: mk_status.rc != 0
+
+- name: Enable metrics-server
+  ansible.builtin.command: minikube addons enable metrics-server
+  changed_when: false
+
+- name: Create Kubernetes namespace
+  ansible.builtin.shell: kubectl create namespace {{ k8s_namespace }} --dry-run=client -o yaml | kubectl apply -f -
+  changed_when: false
+
+- name: Verify node Ready
+  ansible.builtin.command: kubectl get nodes
+  register: nodes_output
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Assert node is Ready
+  ansible.builtin.assert:
+    that:
+      - "'Ready' in nodes_output.stdout"
+    fail_msg: "Kubernetes node is not Ready."
+    success_msg: "Kubernetes node is Ready."
+  when: not ansible_check_mode

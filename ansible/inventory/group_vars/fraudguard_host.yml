@@ -1,0 +1,7 @@
+---
+ansible_python_interpreter: /usr/bin/python3
+minikube_memory: "6g"
+minikube_cpus: 4
+docker_compose_version: "2.24.6"
+docker_image: "kautilyasingh/fraudguard"
+k8s_namespace: "fraudguard"

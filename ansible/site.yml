@@ -1,0 +1,40 @@
+---
+- hosts: fraudguard_host
+  gather_facts: yes
+  roles:
+    - common
+    - docker
+    - kubernetes
+
+  post_tasks:
+    - name: Find Kubernetes manifest files
+      become: no
+      ansible.builtin.find:
+        paths: "{{ playbook_dir }}/../k8s/"
+        recurse: yes
+        patterns:
+          - "*.yaml"
+          - "*.yml"
+          - "*.json"
+        file_type: file
+      register: k8s_manifest_files
+
+    - name: Apply all Kubernetes manifests
+      become: no
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - apply
+          - -f
+          - "{{ playbook_dir }}/../k8s/"
+          - --recursive
+          - -n
+          - "{{ k8s_namespace }}"
+      changed_when: false
+      when: k8s_manifest_files.matched | int > 0
+
+    - name: Skip manifest apply when no Kubernetes manifests exist
+      become: no
+      ansible.builtin.debug:
+        msg: "No Kubernetes manifests found in k8s/. Skipping apply step."
+      when: k8s_manifest_files.matched | int == 0

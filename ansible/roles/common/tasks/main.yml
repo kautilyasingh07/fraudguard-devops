@@ -1,0 +1,32 @@
+---
+- name: Update apt cache
+  become: yes
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install common packages
+  become: yes
+  ansible.builtin.apt:
+    name:
+      - curl
+      - wget
+      - git
+      - vim
+      - net-tools
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - python3-pip
+      - python3-venv
+    state: present
+
+- name: Set timezone to UTC
+  become: yes
+  community.general.timezone:
+    name: UTC
+
+- name: Disable UFW
+  become: yes
+  community.general.ufw:
+    state: disabled
