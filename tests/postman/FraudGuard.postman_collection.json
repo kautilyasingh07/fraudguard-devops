@@ -1,0 +1,190 @@
+{
+  "info": {
+    "_postman_id": "8f5d6f89-7a1e-4b53-b08b-2ca71b146d64",
+    "name": "FraudGuard API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "TC1 Fraud Detection",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "",
+              "pm.test(\"Has prediction field as number\", function () {",
+              "    pm.expect(body).to.have.property(\"prediction\");",
+              "    pm.expect(body.prediction).to.be.a(\"number\");",
+              "});",
+              "",
+              "pm.test(\"confidence_score is greater than 0.5\", function () {",
+              "    pm.expect(body).to.have.property(\"confidence_score\");",
+              "    pm.expect(body.confidence_score).to.be.above(0.5);",
+              "});",
+              "",
+              "pm.test(\"Has label field\", function () {",
+              "    pm.expect(body).to.have.property(\"label\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"TransactionAmt\": 1500.0,\n  \"TransactionDT\": 90986,\n  \"ProductCD\": \"W\",\n  \"card1\": 9500,\n  \"card2\": 117.0,\n  \"card3\": 150.0,\n  \"card4\": \"visa\",\n  \"card5\": 226.0,\n  \"card6\": \"debit\",\n  \"addr1\": 299.0,\n  \"addr2\": 87.0,\n  \"dist1\": 0.0,\n  \"P_emaildomain\": \"gmail.com\",\n  \"R_emaildomain\": \"gmail.com\",\n  \"V1\": 1.0,\n  \"V2\": 1.0,\n  \"V3\": 1.0,\n  \"V4\": 1.0,\n  \"V5\": 1.0,\n  \"V6\": 1.0,\n  \"V7\": 1.0,\n  \"V8\": 0.0,\n  \"V9\": 0.0,\n  \"V10\": 0.0,\n  \"V11\": 0.0,\n  \"V12\": 1.0,\n  \"V13\": 1.0,\n  \"V14\": 1.0,\n  \"V15\": 0.0,\n  \"V16\": 0.0,\n  \"V17\": 0.0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/predict",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "predict"
+          ]
+        }
+      }
+    },
+    {
+      "name": "TC2 Legitimate Transaction",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "",
+              "pm.test(\"prediction equals 0\", function () {",
+              "    pm.expect(body).to.have.property(\"prediction\");",
+              "    pm.expect(body.prediction).to.eql(0);",
+              "});",
+              "",
+              "pm.test(\"label equals legitimate\", function () {",
+              "    pm.expect(body).to.have.property(\"label\");",
+              "    pm.expect(body.label).to.eql(\"legitimate\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"TransactionAmt\": 29.99,\n  \"TransactionDT\": 86400,\n  \"ProductCD\": \"H\",\n  \"card1\": 1234,\n  \"card2\": 321.0,\n  \"card3\": 150.0,\n  \"card4\": \"mastercard\",\n  \"card5\": 102.0,\n  \"card6\": \"credit\",\n  \"addr1\": 100.0,\n  \"addr2\": 60.0,\n  \"dist1\": 5.0,\n  \"P_emaildomain\": \"outlook.com\",\n  \"R_emaildomain\": \"outlook.com\",\n  \"V1\": 0.0,\n  \"V2\": 0.0,\n  \"V3\": 0.0,\n  \"V4\": 0.0,\n  \"V5\": 0.0,\n  \"V6\": 0.0,\n  \"V7\": 0.0,\n  \"V8\": 1.0,\n  \"V9\": 1.0,\n  \"V10\": 1.0,\n  \"V11\": 1.0,\n  \"V12\": 0.0,\n  \"V13\": 0.0,\n  \"V14\": 0.0,\n  \"V15\": 1.0,\n  \"V16\": 1.0,\n  \"V17\": 1.0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/predict",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "predict"
+          ]
+        }
+      }
+    },
+    {
+      "name": "TC3 Health Check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "",
+              "pm.test(\"status is healthy\", function () {",
+              "    pm.expect(body.status).to.eql(\"healthy\");",
+              "});",
+              "",
+              "pm.test(\"model_loaded is true\", function () {",
+              "    pm.expect(body.model_loaded).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "TC4 Invalid Payload 422",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 422\", function () {",
+              "    pm.response.to.have.status(422);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/predict",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "predict"
+          ]
+        }
+      }
+    }
+  ]
+}

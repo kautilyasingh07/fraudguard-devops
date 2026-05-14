@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-pipeline
+  namespace: fraudguard
+data:
+  pipeline.conf: |
+    input { beats { port => 5044 } }
+    filter {
+      json { source => "message" }
+      mutate { add_field => { "app" => "fraudguard" } }
+    }
+    output {
+      elasticsearch {
+        hosts => ["elasticsearch-service:9200"]
+        index => "fraudguard-logs-%{+YYYY.MM.dd}"
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+  namespace: fraudguard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+        - name: logstash
+          image: logstash:8.13.0
+          env:
+            - name: LS_JAVA_OPTS
+              value: "-Xms256m -Xmx256m"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 768Mi
+          ports:
+            - containerPort: 5044
+          volumeMounts:
+            - name: pipeline-config
+              mountPath: /usr/share/logstash/pipeline/pipeline.conf
+              subPath: pipeline.conf
+      volumes:
+        - name: pipeline-config
+          configMap:
+            name: logstash-pipeline
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logstash-service
+  namespace: fraudguard
+spec:
+  type: ClusterIP
+  selector:
+    app: logstash
+  ports:
+    - port: 5044
+      targetPort: 5044

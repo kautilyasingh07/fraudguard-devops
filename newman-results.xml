@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="FraudGuard API Collection" tests="4" time="0.044">
+  <testsuite name="TC1 Fraud Detection" id="35aef2ec-668c-4b0f-9c18-43dab4e3906b" timestamp="2026-05-14T00:32:33.491Z" tests="4" failures="0" errors="0" time="0.030">
+    <testcase name="Status code is 200" time="0.030" classname="Tc1FraudDetection"/>
+    <testcase name="Has prediction field as number" time="0.030" classname="Tc1FraudDetection"/>
+    <testcase name="confidence_score is greater than 0.5" time="0.030" classname="Tc1FraudDetection"/>
+    <testcase name="Has label field" time="0.030" classname="Tc1FraudDetection"/>
+  </testsuite>
+  <testsuite name="TC2 Legitimate Transaction" id="f8b1ee0a-20f9-444b-a4b6-e51d922acac7" timestamp="2026-05-14T00:32:33.491Z" tests="3" failures="0" errors="0" time="0.010">
+    <testcase name="Status code is 200" time="0.010" classname="Tc2LegitimateTransaction"/>
+    <testcase name="prediction equals 0" time="0.010" classname="Tc2LegitimateTransaction"/>
+    <testcase name="label equals legitimate" time="0.010" classname="Tc2LegitimateTransaction"/>
+  </testsuite>
+  <testsuite name="TC3 Health Check" id="27e73e97-dae1-4919-ac11-7096f76ce6d9" timestamp="2026-05-14T00:32:33.491Z" tests="3" failures="0" errors="0" time="0.002">
+    <testcase name="Status code is 200" time="0.002" classname="Tc3HealthCheck"/>
+    <testcase name="status is healthy" time="0.002" classname="Tc3HealthCheck"/>
+    <testcase name="model_loaded is true" time="0.002" classname="Tc3HealthCheck"/>
+  </testsuite>
+  <testsuite name="TC4 Invalid Payload 422" id="78d52ba2-fd75-4493-a431-76e3d54dd4b2" timestamp="2026-05-14T00:32:33.491Z" tests="1" failures="0" errors="0" time="0.002">
+    <testcase name="Status code is 422" time="0.002" classname="Tc4InvalidPayload422"/>
+  </testsuite>
+</testsuites>
