@@ -238,52 +238,7 @@ Swagger UI for interactive API testing.
 
 ---
 
-## 8) Evaluation Demo Script (25-Mark Rubric Oriented)
-
-### 0:00 - 1:00 | Context + Architecture
-1. Introduce problem: real-time transaction fraud detection.
-2. Show architecture diagram and explain GitHub -> Jenkins -> K8s -> ELK flow.
-
-### 1:00 - 3:00 | Environment Readiness
-3. Show Minikube status, namespace resources, and ELK services:
-   ```bash
-   minikube status
-   kubectl get all -n fraudguard
-   kubectl get hpa -n fraudguard
-   ```
-
-### 3:00 - 5:00 | API Validation
-4. Hit `/health` and `/predict` manually:
-   ```bash
-   curl -s http://$(minikube ip):30080/health
-   ```
-5. Show `/docs` and `/metrics`.
-
-### 5:00 - 9:00 | CI/CD Automation
-6. Push a small change to GitHub.
-7. Show webhook trigger in Jenkins.
-8. Walk through all 7 pipeline stages and final status.
-
-### 9:00 - 12:00 | Logging + Observability
-9. Generate prediction traffic.
-10. Open Kibana (`http://<minikube-ip>:30601`) and show indexed fraud logs.
-11. Explain Filebeat -> Logstash -> Elasticsearch pipeline.
-
-### 12:00 - 15:00 | Scalability + Reliability
-12. Run Locust load test.
-13. In parallel terminals, show HPA and pod scaling:
-    ```bash
-    kubectl get hpa -n fraudguard -w
-    kubectl get pods -n fraudguard -w
-    ```
-14. Confirm autoscaling from baseline replicas upward under load.
-
-### 15:00+ | Summary
-15. Recap model quality (ROC-AUC 0.9520), CI/CD automation, and observability outcomes.
-
----
-
-## 9) Directory Structure (Current Project Tree)
+## 8) Directory Structure (Current Project Tree)
 
 ```text
 fraudguard-devops/
@@ -385,7 +340,7 @@ fraudguard-devops/
 
 ---
 
-## 10) Domain Justification and Innovation
+## 9) Domain Justification and Innovation
 
 ### Why FinTech + AIOps?
 

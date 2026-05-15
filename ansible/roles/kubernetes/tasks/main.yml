@@ -25,7 +25,7 @@
     - name: Start minikube
       ansible.builtin.command: >-
         minikube start --driver=docker --memory={{ minikube_memory }}
-        --cpus={{ minikube_cpus }} 
+        --cpus={{ minikube_cpus }} --kubernetes-version=v1.29.0
   rescue:
     - name: Reset broken minikube profile
       ansible.builtin.command: minikube delete --all --purge
@@ -34,7 +34,7 @@
     - name: Start minikube after reset
       ansible.builtin.command: >-
         minikube start --driver=docker --memory={{ minikube_memory }}
-        --cpus={{ minikube_cpus }} 
+        --cpus={{ minikube_cpus }} --kubernetes-version=v1.29.0
 
 - name: Enable metrics-server
   ansible.builtin.command: minikube addons enable metrics-server
