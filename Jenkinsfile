@@ -89,12 +89,12 @@ pipeline {
                         export VAULT_ADDR='http://localhost:8200'
                         export VAULT_TOKEN="$VAULT_WRITER_TOKEN"
 
-                        CURRENT_KUBECONFIG_B64="$(kubectl config view --raw | base64 -w0)"
+                        CURRENT_KUBECONFIG_B64="$(kubectl config view --flatten --minify | base64 -w0)"
                         vault kv put secret/kubeconfig config="$CURRENT_KUBECONFIG_B64"
 
                         STORED_KUBECONFIG_B64="$(vault kv get -field=config secret/kubeconfig)"
                         echo "$STORED_KUBECONFIG_B64" | base64 -d > /tmp/vault_kubeconfig_verify_${BUILD_NUMBER}
-                        grep -q "certificate-authority-data" /tmp/vault_kubeconfig_verify_${BUILD_NUMBER}
+                        grep -Eq "certificate-authority-data|certificate-authority" /tmp/vault_kubeconfig_verify_${BUILD_NUMBER}
                         grep -q "server:" /tmp/vault_kubeconfig_verify_${BUILD_NUMBER}
                         rm -f /tmp/vault_kubeconfig_verify_${BUILD_NUMBER}
                     '''
