@@ -84,6 +84,21 @@ pipeline {
                         python3 -m ansible playbook ansible/site.yml -i ansible/inventory/hosts.ini --diff --extra-vars "docker_image=${DOCKER_IMAGE}:${GIT_COMMIT_SHORT}"
                     fi
                 '''
+                withCredentials([string(credentialsId: 'vault-kubeconfig-writer-token', variable: 'VAULT_WRITER_TOKEN')]) {
+                    sh '''
+                        export VAULT_ADDR='http://localhost:8200'
+                        export VAULT_TOKEN="$VAULT_WRITER_TOKEN"
+
+                        CURRENT_KUBECONFIG_B64="$(kubectl config view --raw | base64 -w0)"
+                        vault kv put secret/kubeconfig config="$CURRENT_KUBECONFIG_B64"
+
+                        STORED_KUBECONFIG_B64="$(vault kv get -field=config secret/kubeconfig)"
+                        echo "$STORED_KUBECONFIG_B64" | base64 -d > /tmp/vault_kubeconfig_verify_${BUILD_NUMBER}
+                        grep -q "certificate-authority-data" /tmp/vault_kubeconfig_verify_${BUILD_NUMBER}
+                        grep -q "server:" /tmp/vault_kubeconfig_verify_${BUILD_NUMBER}
+                        rm -f /tmp/vault_kubeconfig_verify_${BUILD_NUMBER}
+                    '''
+                }
             }
         }
 
@@ -104,9 +119,14 @@ pipeline {
                     sh '''
                         echo "$KUBE_CONFIG" | base64 -d > /tmp/kubeconfig_${BUILD_NUMBER}
                         export KUBECONFIG=/tmp/kubeconfig_${BUILD_NUMBER}
-                        kubectl set image deployment/fraudguard-app fraudguard=${DOCKER_IMAGE}:${GIT_COMMIT_SHORT} -n fraudguard
-                        if ! kubectl rollout status deployment/fraudguard-app -n fraudguard --timeout=120s; then
-                            kubectl rollout undo deployment/fraudguard-app -n fraudguard
+
+                        kubectl version --client
+                        kubectl --kubeconfig=/tmp/kubeconfig_${BUILD_NUMBER} cluster-info
+                        kubectl --kubeconfig=/tmp/kubeconfig_${BUILD_NUMBER} get namespace fraudguard >/dev/null
+
+                        kubectl --kubeconfig=/tmp/kubeconfig_${BUILD_NUMBER} set image deployment/fraudguard-app fraudguard=${DOCKER_IMAGE}:${GIT_COMMIT_SHORT} -n fraudguard
+                        if ! kubectl --kubeconfig=/tmp/kubeconfig_${BUILD_NUMBER} rollout status deployment/fraudguard-app -n fraudguard --timeout=120s; then
+                            kubectl --kubeconfig=/tmp/kubeconfig_${BUILD_NUMBER} rollout undo deployment/fraudguard-app -n fraudguard
                             exit 1
                         fi
                     '''

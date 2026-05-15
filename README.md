@@ -115,6 +115,26 @@ vault kv put secret/kubeconfig \
   config="$(base64 -w 0 ~/.kube/config)"
 ```
 
+```bash
+# Create least-privilege policy for Jenkins kubeconfig refresh (Stage 5)
+cat > /tmp/jenkins-kubeconfig-writer.hcl <<'EOF'
+path "secret/data/kubeconfig" {
+  capabilities = ["create", "update", "read"]
+}
+
+path "secret/metadata/kubeconfig" {
+  capabilities = ["read"]
+}
+EOF
+
+vault policy write jenkins-kubeconfig-writer /tmp/jenkins-kubeconfig-writer.hcl
+```
+
+Jenkins credentials required:
+
+- `vault-approle`: Vault authentication used by `withVault` secret reads.
+- `vault-kubeconfig-writer-token`: Secret text token/AppRole token bound to `jenkins-kubeconfig-writer` policy for Stage 5 kubeconfig refresh.
+
 ### Step 3 - Provision localhost environment via Ansible
 
 ```bash

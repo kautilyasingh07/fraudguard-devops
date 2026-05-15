@@ -22,19 +22,28 @@
 - name: Start or recover minikube if not running
   when: mk_status.rc != 0
   block:
-    - name: Start minikube
+    - name: Start minikube using existing profile settings
       ansible.builtin.command: >-
         minikube start --driver=docker --memory={{ minikube_memory }}
-        --cpus={{ minikube_cpus }} --kubernetes-version=v1.29.0
+        --cpus={{ minikube_cpus }}
   rescue:
-    - name: Reset broken minikube profile
+    - name: Start minikube with requested Kubernetes version
+      ansible.builtin.command: >-
+        minikube start --driver=docker --memory={{ minikube_memory }}
+        --cpus={{ minikube_cpus }} --kubernetes-version={{ minikube_kubernetes_version | default('v1.29.0') }}
+      register: mk_versioned_start
+      ignore_errors: yes
+
+    - name: Reset broken minikube profile as last resort
       ansible.builtin.command: minikube delete --all --purge
       changed_when: false
+      when: mk_versioned_start.rc != 0
 
     - name: Start minikube after reset
       ansible.builtin.command: >-
         minikube start --driver=docker --memory={{ minikube_memory }}
-        --cpus={{ minikube_cpus }} --kubernetes-version=v1.29.0
+        --cpus={{ minikube_cpus }} --kubernetes-version={{ minikube_kubernetes_version | default('v1.29.0') }}
+      when: mk_versioned_start.rc != 0
 
 - name: Enable metrics-server
   ansible.builtin.command: minikube addons enable metrics-server
